@@ -3,7 +3,7 @@ const connection = require("../../config/mysql");
 module.exports = {
   getAllSchedule: (limit, offset, order, sort, location, movie_id) =>
     new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM schedule WHERE location LIKE '%${location}%' AND movie_id LIKE '%${movie_id}%' ORDER BY ${order} ${sort} LIMIT ${limit} OFFSET ${offset}`, (error, result) => {
+      connection.query(`SELECT * FROM schedule WHERE location LIKE '%${location}%' AND id_movie LIKE '%${movie_id}%' ORDER BY ${order} ${sort} LIMIT ${limit} OFFSET ${offset}`, (error, result) => {
         if (!error) {
           resolve(result);
         } else {

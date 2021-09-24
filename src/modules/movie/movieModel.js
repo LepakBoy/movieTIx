@@ -14,7 +14,7 @@ module.exports = {
     }),
   getMovieById: (id) =>
     new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM movie WHERE movie_id = ?", id, (error, result) => {
+      connection.query("SELECT * FROM movie WHERE id_movie = ?", id, (error, result) => {
         if (!error) {
           resolve(result);
         } else {
@@ -47,20 +47,18 @@ module.exports = {
       const query = connection.query("INSERT INTO movie SET ?", data, (error, result) => {
         if (!error) {
           const newResult = {
-            id: result.insertId,
+            id_movie: result.insertId,
             ...data,
           };
           resolve(newResult);
         } else {
-          console.log(error);
           reject(new Error(`SQL : ${error.sqlMessage}`));
         }
       });
-      console.log(query.sql);
     }),
   updateMovie: (data, id) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE movie SET ? WHERE movie_id = ?", [data, id], (error, result) => {
+      connection.query("UPDATE movie SET ? WHERE id_movie = ?", [data, id], (error, result) => {
         if (!error) {
           const newResult = {
             id,
@@ -74,7 +72,7 @@ module.exports = {
     }),
   deleteMovie: (id) =>
     new Promise((resolve, reject) => {
-      connection.query("DELETE FROM movie WHERE movie_id = ?", id, (error, result) => {
+      connection.query("DELETE FROM movie WHERE id_movie = ?", id, (error, result) => {
         if (!error) {
           resolve(id);
         } else {

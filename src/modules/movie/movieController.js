@@ -13,7 +13,7 @@ module.exports = {
         name = "";
       }
       if (!limit) {
-        limit = 3;
+        limit = 10;
       }
       if (!page) {
         page = 1;

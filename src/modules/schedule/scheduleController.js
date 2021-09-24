@@ -22,10 +22,10 @@ module.exports = {
         sort = "ASC";
       }
       if (!movie_id) {
-        movie_id = 1;
+        movie_id = "";
       }
       if (!location) {
-        location = "jakarta";
+        location = "";
       }
 
       const offset = page * limit - limit;
@@ -57,9 +57,9 @@ module.exports = {
   },
   postSchedule: async (req, res) => {
     try {
-      const { movie_id, teater_name, price, location, date_start, date_end, time_schedule } = req.body;
+      const { id_movie, teater_name, price, location, date_start, date_end, time_schedule } = req.body;
       const setData = {
-        movie_id,
+        id_movie,
         teater_name,
         price,
         location,
