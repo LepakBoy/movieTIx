@@ -13,7 +13,7 @@ module.exports = {
     }),
   getScheduleById: (id) =>
     new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM schedule WHERE id =${id}`, (error, result) => {
+      connection.query(`SELECT * FROM schedule WHERE id_schedule =${id}`, (error, result) => {
         if (!error) {
           resolve(result);
         } else {
@@ -36,7 +36,7 @@ module.exports = {
       connection.query("INSERT INTO schedule SET ?", data, (error, result) => {
         if (!error) {
           const newResult = {
-            id: result.insertId,
+            id_schedule: result.insertId,
             ...data,
           };
           resolve(newResult);
@@ -47,7 +47,7 @@ module.exports = {
     }),
   updateSchedule: (data, id) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE schedule SET ? WHERE id = ?", [data, id], (error, result) => {
+      connection.query("UPDATE schedule SET ? WHERE id_schedule = ?", [data, id], (error, result) => {
         if (!error) {
           const newResult = {
             id,
@@ -61,7 +61,7 @@ module.exports = {
     }),
   deleteSchedule: (id) =>
     new Promise((resolve, reject) => {
-      connection.query("DELETE FROM schedule WHERE id = ?", id, (error, result) => {
+      connection.query("DELETE FROM schedule WHERE id_schedule = ?", id, (error, result) => {
         if (!error) {
           resolve(id);
         } else {

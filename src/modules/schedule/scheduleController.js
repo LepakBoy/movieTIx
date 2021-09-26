@@ -38,7 +38,17 @@ module.exports = {
         totalData,
       };
       const result = await scheduleModel.getAllSchedule(limit, offset, order, sort, location, movie_id);
-      return helperWrapper.response(res, 200, `success get all data`, result, pageInfo);
+
+      //MENGUBAH BENTUK TIMESCHEDULE MENJADI ARRAY
+      const newResult = result.map((item) => {
+        const data = {
+          ...item,
+          time_schedule: item.time_schedule.split(","),
+        };
+        return data;
+      });
+
+      return helperWrapper.response(res, 200, `success get all data`, newResult, pageInfo);
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
     }
@@ -50,7 +60,16 @@ module.exports = {
       if (result.length < 1) {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
-      return helperWrapper.response(res, 200, `success get data by id`, result);
+
+      const newResult = result.map((item) => {
+        const data = {
+          ...item,
+          time_schedule: item.time_schedule.split(","),
+        };
+        return data;
+      });
+
+      return helperWrapper.response(res, 200, `success get data by id`, newResult);
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
     }
@@ -67,6 +86,7 @@ module.exports = {
         date_end,
         time_schedule,
       };
+
       const result = await scheduleModel.postSchedule(setData);
       return helperWrapper.response(res, 200, "success create data", result);
     } catch (error) {
