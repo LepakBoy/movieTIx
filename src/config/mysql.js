@@ -1,11 +1,13 @@
-const express = require("express");
+require("dotenv/config");
+
+const { config } = require("dotenv");
 const mysql = require("mysql2");
 
 const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "dbmovie",
+  host: process.env.DATABASE_HOST,
+  user: process.env.USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE,
 });
 
 connection.connect((error) => {

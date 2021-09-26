@@ -4,7 +4,7 @@ module.exports = {
   getBookingById: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT booking.id_booking, seatbooking.id_seat, id_user, booking.date_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_booking = ${id}`,
+        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_booking = ${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -17,7 +17,7 @@ module.exports = {
   getBookingByIdUser: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT booking.id_booking,seatbooking.id_seat, id_user, booking.date_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_user = ${id}`,
+        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_user = ${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
