@@ -35,18 +35,6 @@ module.exports = {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
 
-      //UBAH SEAT MENJADI BENTUK ARRAY SESUAI VALUE DAN LENGTH
-      let getSeat = result.map((item) => {
-        for (data in item) {
-          data += item.seat;
-        }
-        return data;
-      });
-      // console.log(getSeat);
-      result.map((dataResult) => {
-        dataResult.seat = getSeat;
-      });
-
       return helperWrapper.response(res, 200, `succes get data by id`, result);
     } catch (error) {
       return helperWrapper.response(res, `bad request (${error.message})`, null);
