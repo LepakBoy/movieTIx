@@ -1,5 +1,7 @@
 const movieModel = require("./movieModel");
 const helperWrapper = require("../../helper/wrapper");
+const redis = require("../../config/redis");
+const deleteFile = require("../../helper/uploads/deleteFiles");
 
 module.exports = {
   getAllMovie: async (req, res) => {
@@ -8,7 +10,6 @@ module.exports = {
       page = Number(page);
       limit = Number(limit);
 
-      //KENDALA : menentukan nilai default dan handle untuk berbagai keadaan kalo valuenya ada yang kosong
       if (!name) {
         name = "";
       }
@@ -36,6 +37,9 @@ module.exports = {
       };
       const result = await movieModel.getAllMovie(limit, offset, name, order, sort);
 
+      //set ke dalam redis
+      redis.setex(`getMovie:${JSON.stringify(req.query)}`, 3600, JSON.stringify({ result, pageInfo }));
+
       return helperWrapper.response(res, 200, `success get all data`, result, pageInfo);
     } catch (error) {
       return helperWrapper.response(res, `bad request (${error.message})`, null);
@@ -48,6 +52,9 @@ module.exports = {
       if (result.length < 1) {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
+
+      //proses simpan data ke redis
+      redis.setex(`getMovie:${id}`, 3600, JSON.stringify(result));
       return helperWrapper.response(res, 200, `success get data by id`, result);
     } catch (error) {
       return helperWrapper.response(res, `bad request (${error.message})`, null);
@@ -76,6 +83,7 @@ module.exports = {
         cast,
         duration,
         synopsis,
+        image: req.file ? req.file.filename : null,
       };
 
       const result = await movieModel.postMovie(setData);
@@ -85,10 +93,11 @@ module.exports = {
     }
   },
   updateMovie: async (req, res) => {
-    //KENDALA : kalo value kosong saat isi form update, value databse juga menjadi kosong
     try {
       const { id } = req.params;
+      //untuk mendapatkan nama file image di tabel database
       const checkId = await movieModel.getMovieById(id);
+
       if (checkId.length < 1) {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
@@ -101,6 +110,7 @@ module.exports = {
         cast,
         duration,
         synopsis,
+        image: req.file ? req.file.filename : null,
         updatedAt: new Date(Date.now()),
       };
 
@@ -109,6 +119,9 @@ module.exports = {
           delete setData[data];
         }
       }
+      //hapus file sebelumnya
+      //chekId[0].image : nama file image yang didapat dari chekId indeks ke
+      deleteFile(`public/uploads/movie/${checkId[0].image}`);
 
       const result = await movieModel.updateMovie(setData, id);
       return helperWrapper.response(res, 200, `success update data`, result);
@@ -123,6 +136,9 @@ module.exports = {
       if (checkId.length < 1) {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
+
+      deleteFile(`public/uploads/movie/${checkId[0].image}`);
+
       const result = await movieModel.deleteMovie(id);
       return helperWrapper.response(res, 200, `success delete data id ${id}`, result);
     } catch (error) {

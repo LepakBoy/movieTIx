@@ -13,5 +13,6 @@ module.exports = {
   Plugin: ["prettier"],
   rules: {
     "prettier/prettier": ["error", { endOFLine: "auto" }],
+    "prefer-destructuring": ["error", { Object: true, array: false }],
   },
 };

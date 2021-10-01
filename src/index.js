@@ -18,6 +18,7 @@ app.use(helmet(helmet()));
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static("public")); //localhost:3001/uploads/movie/nama file gambar
 
 app.use("/", routerNavigation);
 
