@@ -57,4 +57,32 @@ module.exports = {
         }
       });
     }),
+  updateStatus: (status, id) =>
+    new Promise((resolve, reject) => {
+      connection.query("UPDATE booking SET booking_status = ? WHERE id_booking = ?", [status, id], (error, result) => {
+        if (!error) {
+          const newResult = {
+            id,
+            status,
+          };
+          resolve(newResult);
+        } else {
+          reject(new Error(`SQL : ${error.sqlMessage}`));
+        }
+      });
+    }),
+  dashboard: (data) =>
+    new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT MONTH(booking.createdAt) AS month, SUM(payment_total) AS total FROM booking JOIN schedule WHERE YEAR(booking.createdAt) = YEAR(NOW()) AND schedule.id_movie = ? AND location = ? AND teater_name = ? ",
+        [data.id_movie, data.location, data.teater_name],
+        (error, result) => {
+          if (!error) {
+            resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
+        }
+      );
+    }),
 };

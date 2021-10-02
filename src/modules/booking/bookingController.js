@@ -1,5 +1,6 @@
 const bookingModel = require("./bookingModel");
 const helperWrapper = require("../../helper/wrapper");
+const movieModel = require("../movie/movieModel");
 
 module.exports = {
   getBookingById: async (req, res) => {
@@ -80,6 +81,39 @@ module.exports = {
       });
 
       return helperWrapper.response(res, 200, "success create data", result);
+    } catch (error) {
+      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+    }
+  },
+  bookingStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const status = "ticket used";
+      const result = await bookingModel.updateStatus(status, id);
+
+      return helperWrapper.response(res, 200, "ticket scanned..!", result);
+    } catch (error) {
+      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+    }
+  },
+  getDashboard: async (req, res) => {
+    try {
+      const { id_movie, location, teater_name } = req.query;
+      const setData = {
+        id_movie,
+        location,
+        teater_name,
+      };
+
+      //handle jika ada yang tidak diisi
+      for (data in setData) {
+        if (!setData.data) {
+          return helperWrapper.response(res, 400, `${data} must be filled`, null);
+        }
+      }
+      setData.id_movie = Number(id_movie);
+      const result = await bookingModel.dashboard(setData);
+      return helperWrapper.response(res, 200, "dashboard", result);
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
     }

@@ -7,12 +7,12 @@ const deleteFile = (filePath) => {
   if (fs.existsSync("public/uploads/user")) {
     fs.unlink(filePath, (error) => {
       if (error) {
-        console.log("ada");
+        console.log("no image yet before");
         // return helperWrapper.response(res, 400, err.message, null);
       }
     });
   } else {
-    console.log("ga ada");
+    console.log("no image yet before");
     // return helperWrapper.response(res, 400, "file tidak ada", null);
   }
   //fs.unlink : untuk hapus file berdasarkan file path

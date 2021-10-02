@@ -76,7 +76,6 @@ module.exports = {
         if (!error) {
           resolve(id);
         } else {
-          reject(new Error(`SQL : ${error.sqlMessage}`));
         }
       });
     }),
