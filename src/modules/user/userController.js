@@ -42,7 +42,6 @@ module.exports = {
         updatedAt: new Date(Date.now()),
       };
 
-      console.log(setData);
       for (const data in setData) {
         if (!setData[data]) {
           delete setData[data];
@@ -83,9 +82,17 @@ module.exports = {
       }
 
       const user_image = req.file ? req.file.filename : null;
+      const setData = {
+        user_image,
+        updatedAt: new Date(Date.now()),
+      };
+
+      if (!user_image) {
+        return helperWrapper.response(res, 400, `no image selected...image didn't changed`, null);
+      }
       deleteFile(`public/uploads/user/${chek[0].user_image}`);
 
-      const result = await userModel.editUserImage(user_image, id);
+      const result = await userModel.editUserImage(setData, id);
       return helperWrapper.response(res, 200, `image has been changed`, result);
     } catch (error) {
       return helperWrapper.response(res, `bad request (${error.message})`, null);

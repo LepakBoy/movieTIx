@@ -50,14 +50,15 @@ module.exports = {
         }
       });
     }),
-  editUserImage: (image, id) =>
+  editUserImage: (data, id) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE user SET user_image = ? WHERE id_user = ?", [image, id], (error, result) => {
+      connection.query("UPDATE user SET user_image = ?, updatedAt = ? WHERE id_user = ?", [data.user_image, data.updatedAt, id], (error, result) => {
         if (!error) {
           const newResult = {
             id,
-            image,
+            ...data,
           };
+
           resolve(newResult);
         } else {
           reject(new Error(`SQL : (${error.sqlMessage})`));

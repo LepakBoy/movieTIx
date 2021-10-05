@@ -39,12 +39,3 @@ const uploadFilter = (req, res, next) => {
 };
 
 module.exports = uploadFilter;
-
-// limits: (req, file, cb) => {
-//   if (file.size < 10) {
-//     cb(null, true);
-//   } else {
-//     cb(null, false);
-//     return cb(new Error(`kegedean`));
-//   }
-// },

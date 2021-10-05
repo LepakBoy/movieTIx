@@ -45,16 +45,13 @@ module.exports = {
         return helperWrapper.response(res, 400, `wrong password`);
       }
 
-      // if (password !== checkEmail[0].password) {
-      //   return helperWrapper.response(res, 400, `wrong password`);
-      // }
-
       //proses utama: membuat token dengan JWT(data yang mau diubah, kata kunci, lama token yang bisa dugunakan)
       const payload = checkEmail[0];
       delete payload.password;
 
       //generate dan enkripsi token dengan jwt.sign
-      const token = jwt.sign({ ...payload }, "rahasia", { expiresIn: "24h" });
+      const token = jwt.sign({ ...payload }, process.env.SECRETE_KEY, { expiresIn: "24h" });
+
       return helperWrapper.response(res, 200, `success login`, { id_user: payload.id_user, token });
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request ${error.message}`, null);

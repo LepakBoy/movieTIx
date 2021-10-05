@@ -1,6 +1,6 @@
 const bookingModel = require("./bookingModel");
+const scheduleModel = require("../schedule/scheduleModel");
 const helperWrapper = require("../../helper/wrapper");
-const movieModel = require("../movie/movieModel");
 
 module.exports = {
   getBookingById: async (req, res) => {
@@ -45,6 +45,10 @@ module.exports = {
     try {
       const { id_user, date_booking, time_booking, id_movie, id_schedule, total_ticket, payment_total, payment_method, payment_status, seat } = req.body;
 
+      //ambil harga dari tabel schedule
+      const dataSchedule = await scheduleModel.getScheduleById(id_schedule);
+      const price = dataSchedule[0].price;
+
       const setDataBooking = {
         id_user,
         date_booking,
@@ -60,9 +64,10 @@ module.exports = {
       //MENGUBAH INPUTAN TOTALTICKET BERBENTUK ARRAY MENJADI NUMBER SESUAI LENGTH
       for (data in setDataBooking) {
         setDataBooking.total_ticket = seat.toString().split(",").length;
+        setDataBooking.payment_total = setDataBooking.total_ticket * price;
       }
+
       const result = await bookingModel.postBooking(setDataBooking);
-      console.log(result);
 
       seat.forEach(async (item) => {
         //AMBIL IDBOOKING DARI RESULT
@@ -105,14 +110,24 @@ module.exports = {
         teater_name,
       };
 
+      setData.id_movie = Number(id_movie);
+
       //handle jika ada yang tidak diisi
-      for (data in setData) {
-        if (!setData.data) {
+      for (const data in setData) {
+        if (!setData[data]) {
           return helperWrapper.response(res, 400, `${data} must be filled`, null);
         }
       }
-      setData.id_movie = Number(id_movie);
+
       const result = await bookingModel.dashboard(setData);
+
+      const listMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+      // console.log(result);
+      for (const data of result) {
+        data.month = listMonth[result[0].month - 1];
+      }
+
       return helperWrapper.response(res, 200, "dashboard", result);
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);

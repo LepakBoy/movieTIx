@@ -5,7 +5,6 @@ const helperWrapper = require("../helper/wrapper");
 module.exports = {
   authentication: (req, res, next) => {
     let token = req.headers.authorization;
-    console.log(token);
 
     //cek apakah ada token masih berlaku
     if (!token) {
@@ -20,7 +19,7 @@ module.exports = {
       }
 
       //mencocokan token
-      jwt.verify(token, "rahasia", (error, result) => {
+      jwt.verify(token, process.env.SECRETE_KEY, (error, result) => {
         if (error) {
           return helperWrapper.response(res, 403, error.message);
         }

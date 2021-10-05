@@ -121,6 +121,10 @@ module.exports = {
       }
       //hapus file sebelumnya
       //chekId[0].image : nama file image yang didapat dari chekId indeks ke
+      //tambah kondisi apakah chekID[0] ada isinyan atau tidak
+      if (!setData.image) {
+        return helperWrapper.response(res, 400, `no image selected...image didn't changed`, null);
+      }
       deleteFile(`public/uploads/movie/${checkId[0].image}`);
 
       const result = await movieModel.updateMovie(setData, id);
@@ -137,6 +141,7 @@ module.exports = {
         return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
       }
 
+      //tambah kondisi apakah chekID[0] ada isinyan atau tidak
       deleteFile(`public/uploads/movie/${checkId[0].image}`);
 
       const result = await movieModel.deleteMovie(id);
