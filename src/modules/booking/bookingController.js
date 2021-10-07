@@ -82,7 +82,7 @@ module.exports = {
         };
 
         await bookingModel.postSeatBooking(setDataSeat);
-        console.log(setDataSeat);
+        // console.log(setDataSeat);
       });
 
       return helperWrapper.response(res, 200, "success create data", result);

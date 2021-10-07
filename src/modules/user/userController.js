@@ -90,7 +90,10 @@ module.exports = {
       if (!user_image) {
         return helperWrapper.response(res, 400, `no image selected...image didn't changed`, null);
       }
-      deleteFile(`public/uploads/user/${chek[0].user_image}`);
+
+      if (chek[0].user_image && req.file) {
+        deleteFile(`public/uploads/user/${chek[0].user_image}`);
+      }
 
       const result = await userModel.editUserImage(setData, id);
       return helperWrapper.response(res, 200, `image has been changed`, result);

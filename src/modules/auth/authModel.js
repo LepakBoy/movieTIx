@@ -26,4 +26,14 @@ module.exports = {
         }
       });
     }),
+  // activate: (data) =>
+  //   new Promise((resolve, reject) => {
+  //     connection.query("UPDATE user SET status = ? WHERE email = ?", [data.status, data.email], (error, result) => {
+  //       if (!error) {
+  //         resolve(result);
+  //       } else {
+  //         reject(new Error(`SQL : ${error.sqlMessage}`));
+  //       }
+  //     });
+  //   }),
 };

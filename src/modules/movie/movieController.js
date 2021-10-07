@@ -125,7 +125,9 @@ module.exports = {
       if (!setData.image) {
         return helperWrapper.response(res, 400, `no image selected...image didn't changed`, null);
       }
-      deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      if (checkId[0].image && req.file) {
+        deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      }
 
       const result = await movieModel.updateMovie(setData, id);
       return helperWrapper.response(res, 200, `success update data`, result);
@@ -142,7 +144,9 @@ module.exports = {
       }
 
       //tambah kondisi apakah chekID[0] ada isinyan atau tidak
-      deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      if (checkId[0].image && req.file) {
+        deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      }
 
       const result = await movieModel.deleteMovie(id);
       return helperWrapper.response(res, 200, `success delete data id ${id}`, result);
