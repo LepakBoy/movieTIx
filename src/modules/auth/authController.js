@@ -30,8 +30,11 @@ module.exports = {
         to: email,
         subject: "Email Verification",
         template: "email-verification",
+        //data : yang mau dikirim ke template
         data: {
-          firstname: "",
+          firstname: setData.first_name,
+          email: email,
+          link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
         },
 
         //jika ingin melampirkan attachment
@@ -42,6 +45,7 @@ module.exports = {
           // },
         ],
       };
+      0;
 
       await sendMail(setDataEmail);
 
@@ -51,20 +55,21 @@ module.exports = {
       return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
     }
   },
-  // accountActivate: async (req, res) => {
-  //   try {
-  //     const { email } = req.body;
-  //     const status = "active";
-  //     const setData = {
-  //       email,
-  //       status,
-  //     };
-  //     const result = await authModel.activate(setData);
-  //     return helperWrapper.response(res, 200, `succes set data`, result);
-  //   } catch (error) {
-  //     return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
-  //   }
-  // },
+  accountActivate: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const status = "active";
+      const setData = {
+        id,
+        status,
+      };
+      console.log(setData);
+      const result = await authModel.activate(setData);
+      return helperWrapper.response(res, 200, `succes activate account`, result);
+    } catch (error) {
+      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+    }
+  },
   login: async (req, res) => {
     try {
       const { email, password } = req.body;

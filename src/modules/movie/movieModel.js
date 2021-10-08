@@ -32,9 +32,9 @@ module.exports = {
         }
       });
     }),
-  getCountMovie: () =>
+  getCountMovie: (name) =>
     new Promise((resolve, reject) => {
-      connection.query(`SELECT COUNT (*) AS total FROM movie `, (error, result) => {
+      connection.query(`SELECT COUNT (*) AS total FROM movie WHERE movie_name LIKE '%${name}%'`, (error, result) => {
         if (!error) {
           resolve(result[0].total);
         } else {

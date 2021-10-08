@@ -4,17 +4,19 @@ const path = require("path");
 require("dotenv");
 
 const sendMail = (data) =>
+  //setup email pengirim
   new Promise((resolve, reject) => {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
       auth: {
-        user: "lepakdev@gmail.com",
-        pass: "Lepakdev35.",
+        user: process.env.EMAIL_SENDER,
+        pass: process.env.EMAIL_SENDER_PASS,
       },
     });
 
+    //penghubung setingan email dengan template
     transporter.use(
       "compile",
       hbs({
@@ -36,7 +38,7 @@ const sendMail = (data) =>
       context: data.data,
     };
 
-    //cek apakah ada template di data
+    //cek apakah ada attachment di data
     if (data.attachment || data.attachment.length > 0) {
       mailOptions.attachment = data.attachment;
     }

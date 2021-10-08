@@ -9,5 +9,6 @@ Router.post("/", middlewareAuth.authentication, bookingController.postBooking);
 Router.get("/user/:id", middlewareAuth.authentication, bookingController.getBookingByIdUser);
 Router.get("/ticket-status/:id", middlewareAuth.authentication, middlewareAuth.isAdmin, bookingController.bookingStatus);
 Router.get("/", middlewareAuth.authentication, middlewareAuth.isAdmin, bookingController.getDashboard);
+Router.get("/ticket/:id", bookingController.exportTicket);
 
 module.exports = Router;
