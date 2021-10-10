@@ -34,8 +34,17 @@ module.exports = {
           reject(error);
         });
     }),
-  notif: () =>
+  notif: (body) =>
     new Promise((resolve, reject) => {
       console.log("notif MT");
+      snap.transaction
+        .notification(body)
+        .then((result) => {
+          // console.log(result);
+          resolve(result);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     }),
 };

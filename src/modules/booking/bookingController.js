@@ -5,6 +5,7 @@ const ejs = require("ejs");
 const pdf = require("html-pdf");
 const path = require("path");
 const midtrans = require("../../helper/midtrans");
+const sendMail = require("../../helper/email");
 
 module.exports = {
   getBookingById: async (req, res) => {
@@ -62,7 +63,7 @@ module.exports = {
   },
   postBooking: async (req, res) => {
     try {
-      const { id_user, date_booking, time_booking, id_movie, id_schedule, total_ticket, payment_total, payment_method, payment_status, seat } = req.body;
+      const { id_user, date_booking, time_booking, id_movie, id_schedule, total_ticket, payment_total, seat } = req.body;
 
       //ambil harga dari tabel schedule
       const dataSchedule = await scheduleModel.getScheduleById(id_schedule);
@@ -76,15 +77,15 @@ module.exports = {
         id_schedule,
         total_ticket,
         payment_total,
-        payment_method,
-        payment_status,
       };
 
       //MENGUBAH INPUTAN TOTALTICKET BERBENTUK ARRAY MENJADI NUMBER SESUAI LENGTH
       for (data in setDataBooking) {
         setDataBooking.total_ticket = seat.toString().split(",").length;
         setDataBooking.payment_total = setDataBooking.total_ticket * price;
+        setDataBooking.id_user = req.decodeToken.id_user;
       }
+      console.log(setDataBooking);
 
       const result = await bookingModel.postBooking(setDataBooking);
 
@@ -105,13 +106,82 @@ module.exports = {
 
       const resultMidtrans = await midtrans.post(result.id_booking, setDataBooking.payment_total);
 
-      // id = "12315";
-      // amount = 100000;
-      // const resultMidtrans = await midtrans.post(id, amount);
-
-      //masukan url_redirect ke dalam db terlebih dahulu ====================
+      //masukan url_redirect ke dalam db
+      await bookingModel.paymentUrl(resultMidtrans, result.id_booking);
 
       return helperWrapper.response(res, 200, "success create data", { result, redirect_url: resultMidtrans });
+    } catch (error) {
+      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+    }
+  },
+  postMidtransNotif: async (req, res) => {
+    try {
+      const result = await midtrans.notif(req.body);
+      const { order_id: id_booking, transaction_status: transactionStatus, transaction_time, fraud_status: fraudStatus, payment_type: payment_method } = result;
+
+      const setData = {
+        id_booking,
+        payment_method,
+        transactionStatus,
+      };
+
+      if (transactionStatus == "capture") {
+        // capture only applies to card transaction, which you need to check for the fraudStatus
+        if (fraudStatus == "challenge") {
+          // TODO set transaction status on your databaase to 'challenge'
+        } else if (fraudStatus == "accept") {
+          // TODO set transaction status on your databaase to 'success'
+        }
+      } else if (transactionStatus == "settlement") {
+        // TODO set transaction status on your databaase to 'success'
+
+        setData.transactionStatus = "success";
+        const newSetdata = {
+          ...setData,
+          booking_status: "active",
+        };
+        await bookingModel.midtransNotif(newSetdata);
+
+        const bookingData = await bookingModel.bookingDataEmail(id_booking);
+        const bookingDataObj = bookingData[0];
+
+        const setDataEmail = {
+          to: bookingDataObj.email,
+          subject: "ticket invoice",
+          template: "booking-payment",
+          data: {
+            first_name: bookingDataObj.first_name,
+            id_booking,
+            transaction_time,
+            date_booking: bookingDataObj.date_booking,
+            time_booking: bookingDataObj.time_booking,
+            id_movie: bookingDataObj.id_movie,
+            id_schedule: bookingDataObj.id_schedule,
+            total_ticket: bookingDataObj.total_ticket,
+            payment_total: bookingDataObj.payment_total,
+            payment_method: bookingDataObj.payment_method,
+            payment_status: bookingDataObj.payment_status,
+          },
+          attachment: [
+            //   {
+            //     filename: "invoice payment success",
+            //     // path:
+            //   },
+          ],
+        };
+
+        console.log(setDataEmail);
+
+        await sendMail.bookingPaymentInvoice(setDataEmail);
+        return helperWrapper.response(res, 200, `succes create your booking`, result);
+      } else if (transactionStatus == "deny") {
+        // TODO you can ignore 'deny', because most of the time it allows payment retries
+        // and later can become success
+      } else if (transactionStatus == "cancel" || transactionStatus == "expire") {
+        // TODO set transaction status on your databaase to 'failure'
+      } else if (transactionStatus == "pending") {
+        // TODO set transaction status on your databaase to 'pending' / waiting payment
+      }
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
     }
@@ -120,6 +190,14 @@ module.exports = {
     try {
       const { id } = req.params;
       const status = "ticket used";
+
+      // const idd = "bookingID-" + uuidv4();
+      // console.log(idd);
+      const dataBooking = await bookingModel.getBookingById(id);
+
+      if (dataBooking[0].booking_status !== "active") {
+        return helperWrapper.response(res, 400, `ticket cannot be used`, null);
+      }
       const result = await bookingModel.updateStatus(status, id);
 
       return helperWrapper.response(res, 200, "ticket scanned..!", result);
@@ -203,3 +281,19 @@ module.exports = {
     }
   },
 };
+
+// const history = {
+//   transaction_time: "2021-10-07 10:26:00",
+//   transaction_status: "settlement",
+//   transaction_id: "4635c091-7702-4c28-954f-1bcdd156d150",
+//   status_message: "midtrans payment notification",
+//   status_code: "200",
+//   signature_key: "134hj234jasdfasd908f70890907908adf8907sdf090asd87fa90s8f78907fas890f789d7f890as7f0",
+//   payment_type: "bca_kilkpay",
+//   order_id: "10-24910-4",
+//   merchant_id: "G13409682",
+//   gross_amount: "100000",
+//   fraud_status: "accept",
+//   currency: "IDR",
+//   approval_code: "1123446",
+// };

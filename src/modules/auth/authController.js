@@ -34,7 +34,9 @@ module.exports = {
         data: {
           firstname: setData.first_name,
           email: email,
-          link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
+          //localhost url
+          // link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
+          link: `http://movie-tix.herokuapp.com/auth/activate-account/${setData.id_user}`,
         },
 
         //jika ingin melampirkan attachment
@@ -45,9 +47,8 @@ module.exports = {
           // },
         ],
       };
-      0;
 
-      await sendMail(setDataEmail);
+      await sendMail.verificationAccount(setDataEmail);
 
       const result = await authModel.register(setData);
       return helperWrapper.response(res, 200, `succes set data`, result);
