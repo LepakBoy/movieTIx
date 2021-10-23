@@ -50,7 +50,8 @@ module.exports = {
       });
 
       //set kedalam redis
-      redis.setex(`getSchedule:${JSON.stringify(req.query)}`, 3600, JSON.stringify({ result, pageInfo }));
+      //redis dimatikan karna jika get data schedule dari redis bentuk time_schedule berubah menjadi string||yang diinginkan : array
+      // redis.setex(`getSchedule:${JSON.stringify(req.query)}`, 3600, JSON.stringify({ result, pageInfo }));
 
       return helperWrapper.response(res, 200, `success get all data`, newResult, pageInfo);
     } catch (error) {

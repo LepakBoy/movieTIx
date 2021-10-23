@@ -48,7 +48,7 @@ module.exports = {
         ],
       };
 
-      await sendMail.verificationAccount(setDataEmail);
+      // await sendMail.verificationAccount(setDataEmail);
 
       const result = await authModel.register(setData);
       return helperWrapper.response(res, 200, `succes set data`, result);
@@ -81,9 +81,9 @@ module.exports = {
       }
 
       //cek apaakah acount sudah diaktifasi
-      if (checkEmail[0].status !== "active") {
-        return helperWrapper.response(res, 400, `check your email for account acticvation`, null);
-      }
+      // if (checkEmail[0].status !== "active") {
+      //   return helperWrapper.response(res, 400, `check your email for account acticvation`, null);
+      // }
 
       const validPass = await bcrypt.compare(password, checkEmail[0].password);
       if (!validPass) {
