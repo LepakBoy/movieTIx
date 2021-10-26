@@ -32,6 +32,17 @@ module.exports = {
         }
       });
     }),
+  getMovieMonth: (month) =>
+    new Promise((resolve, reject) => {
+      connection.query("SELECT * FROM movie WHERE MONTH(releaseDate) = ?", month, (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(new Error(`SQL : ${error.sqlMessage}`));
+        }
+      });
+    }),
+
   getCountMovie: (name) =>
     new Promise((resolve, reject) => {
       connection.query(`SELECT COUNT (*) AS total FROM movie WHERE movie_name LIKE '%${name}%'`, (error, result) => {

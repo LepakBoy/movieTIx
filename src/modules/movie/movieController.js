@@ -44,6 +44,16 @@ module.exports = {
     } catch (error) {
       return helperWrapper.response(res, `bad request (${error.message})`, null);
     }
+    z;
+  },
+  getMovieByMonth: async (req, res) => {
+    try {
+      const { month } = req.params;
+      const result = await movieModel.getMovieMonth(month);
+      return helperWrapper.response(res, 200, `success get all data`, result);
+    } catch (error) {
+      return helperWrapper.response(res, `bad request (${error.message})`, null);
+    }
   },
   getMovieById: async (req, res) => {
     try {

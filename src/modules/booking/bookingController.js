@@ -85,10 +85,11 @@ module.exports = {
         setDataBooking.payment_total = setDataBooking.total_ticket * price;
         setDataBooking.id_user = req.decodeToken.id_user;
       }
-      console.log(setDataBooking);
+      // console.log(setDataBooking);
 
       const result = await bookingModel.postBooking(setDataBooking);
 
+      console.log(result);
       seat.forEach(async (item) => {
         //AMBIL IDBOOKING DARI RESULT
         const id_booking = result.id_booking;

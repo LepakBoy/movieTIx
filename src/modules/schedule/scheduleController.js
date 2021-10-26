@@ -51,7 +51,7 @@ module.exports = {
 
       //set kedalam redis
       //redis dimatikan karna jika get data schedule dari redis bentuk time_schedule berubah menjadi string||yang diinginkan : array
-      // redis.setex(`getSchedule:${JSON.stringify(req.query)}`, 3600, JSON.stringify({ result, pageInfo }));
+      // redis.setex(`getSchedule:${JSON.stringify(req.query)}`, 3600, JSON.stringify({ newResult, pageInfo }));
 
       return helperWrapper.response(res, 200, `success get all data`, newResult, pageInfo);
     } catch (error) {
@@ -78,6 +78,16 @@ module.exports = {
       return helperWrapper.response(res, 200, `success get data by id`, newResult);
     } catch (error) {
       return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+    }
+  },
+  getScheduleBetween: async (req, res) => {
+    try {
+      const { dateStart, dateEnd } = req.query;
+      const result = await scheduleModel.getScheduleBetween(dateStart, dateEnd);
+      return helperWrapper.response(res, 200, `success get all data`, result);
+      // console.log(result);
+    } catch {
+      return helperWrapper.response(res, `bad request (${error.message})`, null);
     }
   },
   postSchedule: async (req, res) => {

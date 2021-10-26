@@ -21,6 +21,16 @@ module.exports = {
         }
       });
     }),
+  getScheduleBetween: (dateStart, dateEnd) =>
+    new Promise((resolve, reject) => {
+      connection.query("SELECT * FROM schedule WHERE date_start = ? AND date_end = ?", [dateStart, dateEnd], (error, result) => {
+        if (!error) {
+          resolve(result);
+        } else {
+          reject(new Error(`SQL : ${error.sqlMessage}`));
+        }
+      });
+    }),
   getCountSchedule: () =>
     new Promise((resolve, reject) => {
       connection.query("SELECT COUNT (*) AS total FROM schedule", (error, result) => {

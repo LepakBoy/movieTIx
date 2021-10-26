@@ -11,5 +11,6 @@ Router.get("/:id", middlewareAuth.authentication, middlewareRedis.getMovieByIdRe
 Router.post("/", middlewareAuth.authentication, middlewareRedis.clearMovieRedis, middlewareUpload, movieController.postMovie);
 Router.patch("/:id", middlewareAuth.authentication, middlewareAuth.isAdmin, middlewareRedis.clearMovieRedis, middlewareUpload, movieController.updateMovie);
 Router.delete("/:id", middlewareAuth.authentication, middlewareAuth.isAdmin, middlewareRedis.clearMovieRedis, movieController.deleteMovie);
+Router.get("/month/:month", middlewareAuth.authentication, middlewareAuth.isAdmin, movieController.getMovieByMonth);
 
 module.exports = Router;
