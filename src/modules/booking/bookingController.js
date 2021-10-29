@@ -231,6 +231,7 @@ module.exports = {
       // console.log(result);
       for (const data of result) {
         data.month = listMonth[result[0].month - 1];
+        data.total = Number(data.total);
       }
 
       return helperWrapper.response(res, 200, "dashboard", result);
