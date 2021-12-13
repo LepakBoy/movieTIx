@@ -16,8 +16,8 @@ module.exports = {
     }),
   getBookingByIdUser: (id) =>
     new Promise((resolve, reject) => {
-      connection.query(
-        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_user = ${id}`,
+      const query = connection.query(
+        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_user = '${id}'`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -26,6 +26,7 @@ module.exports = {
           }
         }
       );
+      console.log(query.sql);
     }),
   postBooking: (data) =>
     new Promise((resolve, reject) => {

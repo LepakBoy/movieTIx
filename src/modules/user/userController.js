@@ -10,7 +10,11 @@ module.exports = {
       const result = await userModel.getAllUser();
       return helperWrapper.response(res, 200, `success get all data`, result);
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   getUserById: async (req, res) => {
@@ -20,23 +24,31 @@ module.exports = {
 
       return helperWrapper.response(res, 200, `success get all data`, result);
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   editUser: async (req, res) => {
     try {
       const id = req.decodeToken.id_user;
-      const { email, first_name, last_name } = req.body;
+      const { first_name, last_name } = req.body;
 
       //cek apakah email sudah terpakai
-      const checkEmail = await authModel.checkEmail(email);
+      // const checkEmail = await authModel.checkEmail(email);
 
-      if (checkEmail.length > 0) {
-        return helperWrapper.response(res, 400, `email has registred in another account`, null);
-      }
+      // if (checkEmail.length > 0) {
+      //   return helperWrapper.response(
+      //     res,
+      //     400,
+      //     `email has registred in another account`,
+      //     null
+      //   );
+      // }
 
       const setData = {
-        email,
         first_name,
         last_name,
         updatedAt: new Date(Date.now()),
@@ -49,9 +61,13 @@ module.exports = {
       }
 
       const result = await userModel.editUser(setData, id);
-      return helperWrapper.response(res, 200, `data has been updated`, result);
+      return helperWrapper.response(res, 200, `success update data`, result);
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   changePassword: async (req, res) => {
@@ -67,9 +83,18 @@ module.exports = {
 
       const result = await userModel.changePassword(hash, id);
 
-      return helperWrapper.response(res, 200, `password has been changed`, result);
+      return helperWrapper.response(
+        res,
+        200,
+        `password has been changed`,
+        result
+      );
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   editUserImage: async (req, res) => {
@@ -78,7 +103,12 @@ module.exports = {
       const chek = await userModel.getUserbyId(id);
 
       if (chek.length < 1) {
-        return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
+        return helperWrapper.response(
+          res,
+          404,
+          `data by id ${id} not found`,
+          null
+        );
       }
 
       const user_image = req.file ? req.file.filename : null;
@@ -88,7 +118,12 @@ module.exports = {
       };
 
       if (!user_image) {
-        return helperWrapper.response(res, 400, `no image selected...image didn't changed`, null);
+        return helperWrapper.response(
+          res,
+          400,
+          `no image selected...image didn't changed`,
+          null
+        );
       }
 
       if (chek[0].user_image && req.file) {
@@ -98,7 +133,11 @@ module.exports = {
       const result = await userModel.editUserImage(setData, id);
       return helperWrapper.response(res, 200, `image has been changed`, result);
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
 };

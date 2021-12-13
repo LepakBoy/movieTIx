@@ -13,6 +13,7 @@ module.exports = {
       //proses cek email : email sudh terdaftar atau belum
       //enkrip pasword
       const hash = await bcrypt.hash(password, 12);
+
       const setData = {
         id_user: uuidv4(),
         email,
@@ -23,7 +24,12 @@ module.exports = {
 
       const checkMail = await authModel.checkEmail(email);
       if (checkMail.length > 0) {
-        return helperWrapper.response(res, 400, `email was registred on another account`, null);
+        return helperWrapper.response(
+          res,
+          400,
+          `email was registred on another account`,
+          null
+        );
       }
 
       const setDataEmail = {
@@ -35,8 +41,8 @@ module.exports = {
           firstname: setData.first_name,
           email: email,
           //localhost url
-          // link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
-          link: `http://movie-tix.herokuapp.com/auth/activate-account/${setData.id_user}`,
+          link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
+          // link: `http://movie-tix.herokuapp.com/auth/activate-account/${setData.id_user}`,
         },
 
         //jika ingin melampirkan attachment
@@ -48,12 +54,17 @@ module.exports = {
         ],
       };
 
-      // await sendMail.verificationAccount(setDataEmail);
+      await sendMail.verificationAccount(setDataEmail);
 
       const result = await authModel.register(setData);
       return helperWrapper.response(res, 200, `succes set data`, result);
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request ${error.message}`,
+        null
+      );
     }
   },
   accountActivate: async (req, res) => {
@@ -66,9 +77,20 @@ module.exports = {
       };
       console.log(setData);
       const result = await authModel.activate(setData);
-      return helperWrapper.response(res, 200, `succes activate account`, result);
+
+      return helperWrapper.response(
+        res,
+        200,
+        `succes activate account`,
+        result
+      );
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request ${error.message}`,
+        null
+      );
     }
   },
   login: async (req, res) => {
@@ -80,10 +102,15 @@ module.exports = {
         return helperWrapper.response(res, 400, `email not registred`, null);
       }
 
-      //cek apaakah acount sudah diaktifasi
-      // if (checkEmail[0].status !== "active") {
-      //   return helperWrapper.response(res, 400, `check your email for account acticvation`, null);
-      // }
+      // cek apaakah acount sudah diaktifasi
+      if (checkEmail[0].status !== "active") {
+        return helperWrapper.response(
+          res,
+          400,
+          `check your email for account acticvation`,
+          null
+        );
+      }
 
       const validPass = await bcrypt.compare(password, checkEmail[0].password);
       if (!validPass) {
@@ -95,14 +122,27 @@ module.exports = {
       delete payload.password;
 
       //generate dan enkripsi token dengan jwt.sign
-      const token = jwt.sign({ ...payload }, process.env.SECRETE_KEY, { expiresIn: "2h" });
+      const token = jwt.sign({ ...payload }, process.env.SECRETE_KEY, {
+        expiresIn: "2h",
+      });
 
       //refresh token
-      const refreshToken = jwt.sign({ ...payload }, process.env.SECRETE_KEY, { expiresIn: "24h" });
+      const refreshToken = jwt.sign({ ...payload }, process.env.SECRETE_KEY, {
+        expiresIn: "24h",
+      });
 
-      return helperWrapper.response(res, 200, `success login`, { id_user: payload.id_user, token, refreshToken });
+      return helperWrapper.response(res, 200, `success login`, {
+        id_user: payload.id_user,
+        token,
+        refreshToken,
+      });
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request ${error.message}`,
+        null
+      );
     }
   },
   logout: async (req, res) => {
@@ -112,7 +152,12 @@ module.exports = {
       redis.setex(`accessToken:${token}`, 3600 * 24, token);
       return helperWrapper.response(res, 200, `success logout`, null);
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request ${error.message}`,
+        null
+      );
     }
   },
   refreshToken: async (req, res) => {
@@ -123,7 +168,11 @@ module.exports = {
       redis.get(`refreshToken:${refreshToken}`, (error, result) => {
         //kalau refresh token sudah ada di redis(masuk daftar blacklist)
         if (!error && result !== null) {
-          return helperWrapper.response(res, 400, `your refresh token cannot be used again`);
+          return helperWrapper.response(
+            res,
+            400,
+            `your refresh token cannot be used again`
+          );
         }
 
         //cek apakah refresh token masih aktif?
@@ -135,16 +184,29 @@ module.exports = {
 
           delete result.iat;
           delete result.exp;
-          const token = jwt.sign(result, process.env.SECRETE_KEY, { expiresIn: "2h" });
-          const newRefreshToken = jwt.sign(result, process.env.SECRETE_KEY, { expiresIn: "24h" });
+          const token = jwt.sign(result, process.env.SECRETE_KEY, {
+            expiresIn: "2h",
+          });
+          const newRefreshToken = jwt.sign(result, process.env.SECRETE_KEY, {
+            expiresIn: "24h",
+          });
 
           //masukan refresh token yang lama ke redis untuk di nonaktifkan/blacklist
           redis.setex(`refreshToken:${refreshToken}`, 3600 * 24, refreshToken);
-          return helperWrapper.response(res, 200, `success refresh token`, { id: result.id, token, refreshToken: newRefreshToken });
+          return helperWrapper.response(res, 200, `success refresh token`, {
+            id: result.id,
+            token,
+            refreshToken: newRefreshToken,
+          });
         });
       });
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request ${error.message}`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request ${error.message}`,
+        null
+      );
     }
   },
 };

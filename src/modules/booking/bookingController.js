@@ -13,7 +13,12 @@ module.exports = {
       const { id } = req.params;
       const result = await bookingModel.getBookingById(id);
       if (result.length < 1) {
-        return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
+        return helperWrapper.response(
+          res,
+          404,
+          `data by id ${id} not found`,
+          null
+        );
       }
 
       //UBAH SEAT MENJADI BENTUK ARRAY SESUAI VALUE DAN LENGTH
@@ -28,9 +33,18 @@ module.exports = {
         dataResult.seat = getSeat;
       });
 
-      return helperWrapper.response(res, 200, `succes get data by id`, result[0]);
+      return helperWrapper.response(
+        res,
+        200,
+        `succes get data by id`,
+        result[0]
+      );
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   getBookingByIdUser: async (req, res) => {
@@ -38,16 +52,25 @@ module.exports = {
       const { id } = req.params;
       const result = await bookingModel.getBookingByIdUser(id);
       if (result.length < 1) {
-        return helperWrapper.response(res, 404, `data by id ${id} not found`, null);
+        return helperWrapper.response(
+          res,
+          200,
+          `data by id ${id} not found`,
+          []
+        );
       }
 
       //menyatukan seat berdasarkan id user
       const newResult = [];
       result.forEach((item) => {
-        const filterId = newResult.filter((x) => x.id_booking === item.id_booking);
+        const filterId = newResult.filter(
+          (x) => x.id_booking === item.id_booking
+        );
         if (filterId.length) {
           const indexResult = newResult.indexOf(filterId[0]);
-          newResult[indexResult].seat = newResult[indexResult].seat.concat(item.seat);
+          newResult[indexResult].seat = newResult[indexResult].seat.concat(
+            item.seat
+          );
         } else {
           if (typeof item.seat === "string") {
             item.seat = [item.seat];
@@ -56,14 +79,32 @@ module.exports = {
         }
       });
 
-      return helperWrapper.response(res, 200, `succes get data by id`, newResult);
+      return helperWrapper.response(
+        res,
+        200,
+        `succes get data by id`,
+        newResult
+      );
     } catch (error) {
-      return helperWrapper.response(res, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   postBooking: async (req, res) => {
     try {
-      const { id_user, date_booking, time_booking, id_movie, id_schedule, total_ticket, payment_total, seat } = req.body;
+      const {
+        id_user,
+        date_booking,
+        time_booking,
+        id_movie,
+        id_schedule,
+        total_ticket,
+        payment_total,
+        seat,
+      } = req.body;
 
       //ambil harga dari tabel schedule
       const dataSchedule = await scheduleModel.getScheduleById(id_schedule);
@@ -105,20 +146,37 @@ module.exports = {
         await bookingModel.postSeatBooking(setDataSeat);
       });
 
-      const resultMidtrans = await midtrans.post(result.id_booking, setDataBooking.payment_total);
+      const resultMidtrans = await midtrans.post(
+        result.id_booking,
+        setDataBooking.payment_total
+      );
 
       //masukan url_redirect ke dalam db
       await bookingModel.paymentUrl(resultMidtrans, result.id_booking);
 
-      return helperWrapper.response(res, 200, "success create data", { result, redirect_url: resultMidtrans });
+      return helperWrapper.response(res, 200, "success create data", {
+        result,
+        redirect_url: resultMidtrans,
+      });
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   postMidtransNotif: async (req, res) => {
     try {
       const result = await midtrans.notif(req.body);
-      const { order_id: id_booking, transaction_status: transactionStatus, transaction_time, fraud_status: fraudStatus, payment_type: payment_method } = result;
+      const {
+        order_id: id_booking,
+        transaction_status: transactionStatus,
+        transaction_time,
+        fraud_status: fraudStatus,
+        payment_type: payment_method,
+      } = result;
 
       const setData = {
         id_booking,
@@ -174,17 +232,30 @@ module.exports = {
         console.log(setDataEmail);
 
         await sendMail.bookingPaymentInvoice(setDataEmail);
-        return helperWrapper.response(res, 200, `succes create your booking`, result);
+        return helperWrapper.response(
+          res,
+          200,
+          `succes create your booking`,
+          result
+        );
       } else if (transactionStatus == "deny") {
         // TODO you can ignore 'deny', because most of the time it allows payment retries
         // and later can become success
-      } else if (transactionStatus == "cancel" || transactionStatus == "expire") {
+      } else if (
+        transactionStatus == "cancel" ||
+        transactionStatus == "expire"
+      ) {
         // TODO set transaction status on your databaase to 'failure'
       } else if (transactionStatus == "pending") {
         // TODO set transaction status on your databaase to 'pending' / waiting payment
       }
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   bookingStatus: async (req, res) => {
@@ -203,7 +274,12 @@ module.exports = {
 
       return helperWrapper.response(res, 200, "ticket scanned..!", result);
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   getDashboard: async (req, res) => {
@@ -220,13 +296,31 @@ module.exports = {
       //handle jika ada yang tidak diisi
       for (const data in setData) {
         if (!setData[data]) {
-          return helperWrapper.response(res, 400, `${data} must be filled`, null);
+          return helperWrapper.response(
+            res,
+            400,
+            `${data} must be filled`,
+            null
+          );
         }
       }
 
       const result = await bookingModel.dashboard(setData);
 
-      const listMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const listMonth = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
 
       // console.log(result);
       for (const data of result) {
@@ -236,7 +330,12 @@ module.exports = {
 
       return helperWrapper.response(res, 200, "dashboard", result);
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
   exportTicket: async (req, res) => {
@@ -246,40 +345,59 @@ module.exports = {
       //dataBooking: untuk mengambil data dari db yang akan ditampilkan ke pdf
       const dataBooking = await bookingModel.getBookingById(id);
       //mengambil template .ejs yang akan di render ke pdf
-      ejs.renderFile(path.resolve("./src/template/pdf/ticket.ejs"), { dataBooking }, (error, result) => {
-        if (error) {
-          console.log(error);
-        } else {
-          //options : settingan ukuran/bentuk pdf || diambil dari dokumentasi medium.com
-          let options = {
-            height: "11.25in",
-            width: "8.5in",
-            header: {
-              height: "20mm",
-            },
-            footer: {
-              height: "20mm",
-            },
-          };
-          //pdf.create: render file ke pdf => param1=diambil dari hasil getdata db(berhasil mengambil dataBooking baris 162 maka disimpan didalam result), param2=setingan yang akan diimpelementasi ke pdf
-          //.toFile: lokasi file pdf yang telah dirender
-          pdf.create(result, options).toFile(path.resolve(`./public/generate/${fileName}`), (error, result) => {
-            console.log(result);
-            if (error) {
-              console.log(error);
-            } else {
-              return helperWrapper.response(res, 200, `success export ticket`, {
-                url: `http://localhost:3000/generate/${fileName}`,
-              });
-              // console.log({
-              //   url: `http://localhost:3000/generate/${fileName}`,
-              // });
-            }
-          });
+      ejs.renderFile(
+        path.resolve("./src/template/pdf/ticket.ejs"),
+        { dataBooking },
+        (error, result) => {
+          if (error) {
+            console.log(error);
+          } else {
+            //options : settingan ukuran/bentuk pdf || diambil dari dokumentasi medium.com
+            let options = {
+              height: "11.25in",
+              width: "8.5in",
+              header: {
+                height: "20mm",
+              },
+              footer: {
+                height: "20mm",
+              },
+            };
+            //pdf.create: render file ke pdf => param1=diambil dari hasil getdata db(berhasil mengambil dataBooking baris 162 maka disimpan didalam result), param2=setingan yang akan diimpelementasi ke pdf
+            //.toFile: lokasi file pdf yang telah dirender
+            pdf
+              .create(result, options)
+              .toFile(
+                path.resolve(`./public/generate/${fileName}`),
+                (error, result) => {
+                  console.log(result);
+                  if (error) {
+                    console.log(error);
+                  } else {
+                    return helperWrapper.response(
+                      res,
+                      200,
+                      `success export ticket`,
+                      {
+                        url: `http://localhost:3000/generate/${fileName}`,
+                      }
+                    );
+                    // console.log({
+                    //   url: `http://localhost:3000/generate/${fileName}`,
+                    // });
+                  }
+                }
+              );
+          }
         }
-      });
+      );
     } catch (error) {
-      return helperWrapper.response(res, 400, `bad request (${error.message})`, null);
+      return helperWrapper.response(
+        res,
+        400,
+        `bad request (${error.message})`,
+        null
+      );
     }
   },
 };
