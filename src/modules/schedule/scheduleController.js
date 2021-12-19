@@ -14,7 +14,7 @@ module.exports = {
         page = 1;
       }
       if (!limit) {
-        limit = 10;
+        limit = 200;
       }
       if (!order) {
         order = "price";

@@ -21,23 +21,17 @@ module.exports = {
         );
       }
 
-      //UBAH SEAT MENJADI BENTUK ARRAY SESUAI VALUE DAN LENGTH
-      let getSeat = result.map((item) => {
-        for (data in item) {
-          data += item.seat;
-        }
-        return data;
-      });
-      // console.log(getSeat);
-      result.map((dataResult) => {
-        dataResult.seat = getSeat;
-      });
+      // UBAH SEAT MENJADI BENTUK ARRAY SESUAI VALUE DAN LENGTH
+      const seat = result.map((item) => item.seat);
+
+      const newResult = { ...result[0], seat };
+      console.log(newResult);
 
       return helperWrapper.response(
         res,
         200,
         `succes get data by id`,
-        result[0]
+        newResult
       );
     } catch (error) {
       return helperWrapper.response(

@@ -4,7 +4,7 @@ module.exports = {
   getBookingById: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, booking_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_booking = ${id}`,
+        `SELECT booking.id_booking, id_user, booking.createdAt, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, booking_status, seatbooking.seat, movie.movie_name, schedule.teater_name FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking JOIN movie ON booking.id_movie=movie.id_movie JOIN schedule ON booking.id_schedule=schedule.id_schedule WHERE booking.id_booking = ${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -17,7 +17,7 @@ module.exports = {
   getBookingByIdUser: (id) =>
     new Promise((resolve, reject) => {
       const query = connection.query(
-        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking WHERE booking.id_user = '${id}'`,
+        `SELECT booking.id_booking, id_user, booking.date_booking, booking.time_booking, booking.booking_status, booking.id_schedule, booking.id_movie, total_ticket, booking.payment_total, payment_method, payment_status, seatbooking.seat, movie.movie_name, schedule.teater_name FROM booking JOIN seatbooking ON booking.id_booking=seatbooking.id_booking JOIN movie ON booking.id_movie=movie.id_movie JOIN schedule ON booking.id_schedule=schedule.id_schedule WHERE booking.id_user = '${id}'`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -45,32 +45,40 @@ module.exports = {
     }),
   postSeatBooking: (data) =>
     new Promise((resolve, reject) => {
-      connection.query("INSERT INTO seatbooking SET ?", data, (error, result) => {
-        if (!error) {
-          const newResult = {
-            id_seat: result.insertId,
-            ...data,
-          };
+      connection.query(
+        "INSERT INTO seatbooking SET ?",
+        data,
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              id_seat: result.insertId,
+              ...data,
+            };
 
-          resolve(newResult);
-        } else {
-          reject(new Error(`SQL : ${error.sqlMessage}`));
+            resolve(newResult);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
         }
-      });
+      );
     }),
   updateStatus: (status, id) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE booking SET booking_status = ? WHERE id_booking = ?", [status, id], (error, result) => {
-        if (!error) {
-          const newResult = {
-            id,
-            status,
-          };
-          resolve(newResult);
-        } else {
-          reject(new Error(`SQL : ${error.sqlMessage}`));
+      connection.query(
+        "UPDATE booking SET booking_status = ? WHERE id_booking = ?",
+        [status, id],
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              id,
+              status,
+            };
+            resolve(newResult);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
         }
-      });
+      );
     }),
   dashboard: (data) =>
     new Promise((resolve, reject) => {
@@ -88,23 +96,36 @@ module.exports = {
     }),
   midtransNotif: (data) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE booking SET payment_method = ?, payment_status = ?, booking_status = ? WHERE id_booking = ?", [data.payment_method, data.transactionStatus, data.booking_status, data.id_booking], (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(new Error(`SQL : ${error.sqlMessage}`));
+      connection.query(
+        "UPDATE booking SET payment_method = ?, payment_status = ?, booking_status = ? WHERE id_booking = ?",
+        [
+          data.payment_method,
+          data.transactionStatus,
+          data.booking_status,
+          data.id_booking,
+        ],
+        (error, result) => {
+          if (!error) {
+            resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
         }
-      });
+      );
     }),
   paymentUrl: (url, id) =>
     new Promise((resolve, reject) => {
-      connection.query("UPDATE booking SET payment_url = ? WHERE id_booking = ?", [url, id], (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(new Error(`SQL : ${error.sqlMessage}`));
+      connection.query(
+        "UPDATE booking SET payment_url = ? WHERE id_booking = ?",
+        [url, id],
+        (error, result) => {
+          if (!error) {
+            resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
         }
-      });
+      );
     }),
   bookingDataEmail: (id) =>
     new Promise((resolve, reject) => {
