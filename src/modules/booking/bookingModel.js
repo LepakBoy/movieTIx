@@ -83,7 +83,7 @@ module.exports = {
   dashboard: (data) =>
     new Promise((resolve, reject) => {
       connection.query(
-        "SELECT MONTH(booking.createdAt) AS month, SUM(payment_total) AS total FROM booking JOIN schedule WHERE YEAR(booking.createdAt) = YEAR(NOW()) AND schedule.id_movie = ? AND location = ? AND teater_name = ? ",
+        " SELECT MONTHNAME(b.createdAt) AS month, SUM(b.payment_total) AS total FROM booking AS b JOIN schedule AS s ON b.id_schedule = s.id_schedule WHERE YEAR(s.createdAt) = YEAR(NOW()) AND b.id_movie = ? AND s.location = ? AND s.teater_name = ? GROUP BY MONTHNAME(b.createdAt)",
         [data.id_movie, data.location, data.teater_name],
         (error, result) => {
           if (!error) {
@@ -127,6 +127,7 @@ module.exports = {
         }
       );
     }),
+
   bookingDataEmail: (id) =>
     new Promise((resolve, reject) => {
       connection.query(

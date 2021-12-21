@@ -285,7 +285,7 @@ module.exports = {
         teater_name,
       };
 
-      setData.id_movie = Number(id_movie);
+      // setData.id_movie = Number(id_movie);
 
       //handle jika ada yang tidak diisi
       for (const data in setData) {
@@ -298,8 +298,6 @@ module.exports = {
           );
         }
       }
-
-      const result = await bookingModel.dashboard(setData);
 
       const listMonth = [
         "January",
@@ -316,13 +314,26 @@ module.exports = {
         "December",
       ];
 
-      // console.log(result);
-      for (const data of result) {
-        data.month = listMonth[result[0].month - 1];
-        data.total = Number(data.total);
+      const result = await bookingModel.dashboard(setData);
+
+      const newResult = [];
+
+      for (const x of listMonth) {
+        let item = 0;
+        for (const y of result) {
+          if (x === y.month) {
+            item += 1;
+            newResult.push({ month: y.month, total: y.total });
+          }
+        }
+        if (item === 0) {
+          newResult.push({ month: x, total: 0 });
+        }
       }
 
-      return helperWrapper.response(res, 200, "dashboard", result);
+      console.log(newResult);
+
+      return helperWrapper.response(res, 200, "dashboard", newResult);
     } catch (error) {
       return helperWrapper.response(
         res,
