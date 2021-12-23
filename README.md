@@ -1,6 +1,6 @@
 # Project Backgorund
 
-MovieTix adalah aplikasi pemesanan tiket film yang berbasis onine. Pada repository ini, khusus menyediakan API backend yang akan dihubungkan ke sisi Frontend aplikasi movieTix.
+MovieTix adalah aplikasi pemesanan tiket film yang berbasis onine. Pada repository ini, khusus menyediakan API backend yang akan dihubungkan ke sisi Frontend aplikasi movieTix web dan mobile.
 Pada sisi Backend ini dibuat menggunakan framework ExpressJs dan MySQL sebagai database nya.
 
 Pada aplikasi movieTix ini user dapat melakukan pemesanan tiket, melihat jadwal film yang sedang tayang, dan daftar film yang akan tayang.
