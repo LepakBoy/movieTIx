@@ -32,29 +32,29 @@ module.exports = {
         );
       }
 
-      // const setDataEmail = {
-      //   to: email,
-      //   subject: "Email Verification",
-      //   template: "email-verification",
-      //   //data : yang mau dikirim ke template
-      //   data: {
-      //     firstname: setData.first_name,
-      //     email: email,
-      //     //localhost url
-      //     link: `http://localhost:3000/auth/activate-account/${setData.id_user}`,
-      //     // link: `http://movie-tix.herokuapp.com/auth/activate-account/${setData.id_user}`,
-      //   },
+      const setDataEmail = {
+        to: email,
+        subject: "Email Verification",
+        template: "email-verification",
+        //data : yang mau dikirim ke template
+        data: {
+          firstname: setData.first_name,
+          email: email,
+          //localhost url
+          link: `${process.env.API_BE}auth/activate-account/${setData.id_user}`,
+          // link: `http://movie-tix.herokuapp.com/auth/activate-account/${setData.id_user}`,
+        },
 
-      //   //jika ingin melampirkan attachment
-      //   attachment: [
-      //     // {
-      //     //   filename: "movie1.jpg",
-      //     //   path: "./public/uploads/movie/2021-09-30T07-27-22.329Zwa.jpeg",
-      //     // },
-      //   ],
-      // };
+        //jika ingin melampirkan attachment
+        attachment: [
+          // {
+          //   filename: "movie1.jpg",
+          //   path: "./public/uploads/movie/2021-09-30T07-27-22.329Zwa.jpeg",
+          // },
+        ],
+      };
 
-      // await sendMail.verificationAccount(setDataEmail);
+      await sendMail.verificationAccount(setDataEmail);
 
       const result = await authModel.register(setData);
       return helperWrapper.response(res, 200, `succes set data`, result);
