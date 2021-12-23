@@ -30,7 +30,10 @@ Fitur - Fitur dalam Project
 
 
 
+# Frontend 
 
+- [MovieTix web](https://github.com/LepakBoy/movietix-integration)
+- [MovieTix mobile](https://github.com/LepakBoy/movietix_mobile)
 
 
 # Deploy
